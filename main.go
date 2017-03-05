@@ -19,7 +19,7 @@ type CommandFunc func(*Storage, *CliOptions) error
 var commands = map[string]CommandFunc{
 	// print out clipboard history
 	"ls": func(storage *Storage, cli *CliOptions) error {
-		storage.List()
+		storage.List(cli.Last)
 		return nil
 	},
 

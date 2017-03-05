@@ -14,6 +14,7 @@ import (
 )
 
 const DB_DRIVER string = "sqlite3"
+const CLIPS_TABLE string = "clips"
 
 type Storage struct {
 	db *sql.DB
@@ -60,11 +61,12 @@ func (s *Storage) Get(rowID int) (string, error) {
 	return content, nil
 }
 
-func (s *Storage) List() {
-	sqlReadall := `
-	SELECT rowid, id, content FROM clips
+func (s *Storage) List(limit int) {
+	sqlReadall := fmt.Sprintf(`
+	SELECT rowid, id, content FROM %s
 	ORDER BY datetime(created_at) DESC
-	`
+	LIMIT %d
+	`, CLIPS_TABLE, limit)
 
 	rows, _ := s.db.Query(sqlReadall)
 	defer rows.Close()

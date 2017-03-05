@@ -15,6 +15,7 @@ const (
 	DEFAULT_REFRESH = "1s"
 	DEFAULT_DB_PATH = "/tmp/clip.db"
 	DEFAULT_COMMAND = "ls"
+	DEFAULT_LAST = 20
 )
 
 type CliOptions struct {
@@ -28,12 +29,16 @@ type CliOptions struct {
 
 	// human readable refresh rate before updating the clipboard history
 	Refresh time.Duration
+
+	// number of items to show with `ls`
+	Last int
 }
 
 func NewCliOptions() (*CliOptions, error) {
 	dbPath := flag.String("db", DEFAULT_DB_PATH, "database fs path")
 	reset := flag.Bool("reset", false, "empty database before starting")
 	rawRefresh := flag.String("refresh", DEFAULT_REFRESH, "clipboard refresh rate")
+	last := flag.Int("last", DEFAULT_LAST, "number of clips to show")
 	flag.Parse()
 
 	refreshRate, err := time.ParseDuration(*rawRefresh)
@@ -53,6 +58,7 @@ func NewCliOptions() (*CliOptions, error) {
 		DBPath:  *dbPath,
 		Reset:   *reset,
 		Refresh: refreshRate,
+		Last:    *last,
 	}, nil
 }
 

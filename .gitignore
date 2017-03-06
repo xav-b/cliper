@@ -17,4 +17,10 @@
 .glide/
 
 cliper
-
+# local clips database
+*.db
+_dist/
+.DS_STORE
+vendor/
+.env
+.goxc.local.json

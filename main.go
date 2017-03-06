@@ -59,7 +59,7 @@ func main() {
 
 	runnable, ok := commands[cli.Command]
 	if !ok {
-		fmt.Printf("invalid command: %s\n (watch|ls|cp)", cli.Command)
+		fmt.Printf("invalid command: %s (pick watch|ls|cp)\n", cli.Command)
 		os.Exit(0)
 	}
 	if err := runnable(storage, cli); err != nil {

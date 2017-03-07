@@ -9,15 +9,18 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/olekukonko/tablewriter"
 )
 
 const DB_DRIVER string = "sqlite3"
 const CLIPS_TABLE string = "clips"
 
 type Storage struct {
-	db *sql.DB
+	db    *sql.DB
+	table *tablewriter.Table
 }
 
 func NewStorage(dbPath string, reset bool) (*Storage, error) {
@@ -28,7 +31,12 @@ func NewStorage(dbPath string, reset bool) (*Storage, error) {
 
 	db, err := sql.Open(DB_DRIVER, dbPath)
 
-	return &Storage{db}, err
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetHeader([]string{"ID", "CONTENT"})
+	table.SetBorder(true)
+	table.SetRowLine(true)
+
+	return &Storage{db, table}, err
 }
 
 func (s *Storage) Init() error {
@@ -68,6 +76,7 @@ func (s *Storage) List(limit int) {
 	LIMIT %d
 	`, CLIPS_TABLE, limit)
 
+	log.Printf("scaning for clips")
 	rows, _ := s.db.Query(sqlReadall)
 	defer rows.Close()
 
@@ -75,8 +84,10 @@ func (s *Storage) List(limit int) {
 		var clipShortcut int
 		item := NewClip()
 		_ = rows.Scan(&clipShortcut, &item.Hash, &item.Content)
-		fmt.Printf("[ %d ]\t%s\n", clipShortcut, item.Content)
+		s.table.Append([]string{strconv.Itoa(clipShortcut), item.Content})
 	}
+
+	s.table.Render()
 }
 
 func (s *Storage) SaveIfNew(c *Clip) error {

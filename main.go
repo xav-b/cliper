@@ -4,42 +4,17 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"os"
-	"strconv"
-	"time"
-
-	"github.com/atotto/clipboard"
 )
 
 type CommandFunc func(*Storage, *CliOptions) error
 
 var commands = map[string]CommandFunc{
-	// print out clipboard history
-	"ls": func(storage *Storage, cli *CliOptions) error {
-		storage.List(cli.Last)
-		return nil
-	},
-
-	"cp": func(storage *Storage, cli *CliOptions) error {
-		clipShortcut, _ := strconv.Atoi(flag.Arg(1))
-		res, _ := storage.Get(clipShortcut)
-		return clipboard.WriteAll(res)
-	},
-
-	"watch": func(storage *Storage, cli *CliOptions) error {
-		log.Printf("watching for clipboard [refresh=%v]\n", cli.Refresh)
-		for {
-			c := NewClip()
-			if err := storage.SaveIfNew(c); err != nil {
-				return err
-			}
-
-			time.Sleep(cli.Refresh)
-		}
-	},
+	"ls":    PrintHistory,
+	"cp":    CopyClip,
+	"watch": WatchClipboard,
 }
 
 func main() {

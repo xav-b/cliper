@@ -1,4 +1,4 @@
-# Cliper [![GoDoc Widget]][walker]
+# Cliper [![GoDoc Widget]][walker] [![Go Report Card](https://goreportcard.com/badge/github.com/hackliff/cliper)](https://goreportcard.com/report/github.com/hackliff/cliper) [![Circle CI](https://circleci.com/gh/hackliff/cliper.svg?style=svg)](https://circleci.com/gh/hackliff/cliper)
 
 > Light clipboard manager from the command line
 
@@ -10,7 +10,7 @@ example.
 
 ## Usage
 
-**Cliper** works in client/server mode : a server watches the clipboard
+The tool works in client/server mode : a daemon watches the clipboard
 and stores its history, while you can query it from the client.
 
 Typically you will want to fire the server as a startup daemon and
@@ -69,6 +69,9 @@ curl \
 cliper -help
 ```
 
+For the cutting edge version (but probably stable), compile from source: `go get -t -u
+github.com/hackliff/cliper`
+
 ## API Documentation
 
 Check it out on [gowalker][walker], [godoc][GoDoc], or browse it
@@ -78,6 +81,16 @@ locally:
 $ make godoc
 $ $BROWSER localhost:6060/pkg/github.com/hackliff/cliper
 ```
+
+
+## Features Ideas
+
+- [Use ncurses interface](https://appliedgo.net/tui)
+- Star/Pin and persist useful entries
+- (Fuzzy) search large history
+- Use special keywords (`last`, `down`, `first_match`)
+- Integrate with remote services/stack overflow ? `cliper cp python`
+- Use special actions when recognizing url (open page), code, ...
 
 
 ## Conventions

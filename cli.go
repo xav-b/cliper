@@ -15,10 +15,11 @@ const (
 	DEFAULT_REFRESH = "1s"
 	DEFAULT_DB_PATH = "/tmp/clip.db"
 	DEFAULT_COMMAND = "ls"
-	DEFAULT_LAST = 20
+	DEFAULT_LAST    = 20
 )
 
 type CliOptions struct {
+	// one of cp|list|watch commands
 	Command string
 
 	// file path for database initialization

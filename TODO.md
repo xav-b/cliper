@@ -9,4 +9,6 @@ cliper -fuzzy "https" -last 1 -output "{{ .clip }}" ls | open`
 ```
 
 - CI and Tests
-- Fix Makefile tooling
+- Lint and refactoring
+- Proper doc
+- Fix Makefile tooling (see crosscompilation of sqlite)

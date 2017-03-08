@@ -9,18 +9,15 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/olekukonko/tablewriter"
 )
 
 const DB_DRIVER string = "sqlite3"
 const CLIPS_TABLE string = "clips"
 
 type Storage struct {
-	db    *sql.DB
-	table *tablewriter.Table
+	db *sql.DB
 }
 
 func NewStorage(dbPath string, reset bool) (*Storage, error) {
@@ -31,12 +28,7 @@ func NewStorage(dbPath string, reset bool) (*Storage, error) {
 
 	db, err := sql.Open(DB_DRIVER, dbPath)
 
-	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"ID", "CONTENT"})
-	table.SetBorder(true)
-	table.SetRowLine(true)
-
-	return &Storage{db, table}, err
+	return &Storage{db}, err
 }
 
 func (s *Storage) Init() error {
@@ -51,7 +43,7 @@ func (s *Storage) Init() error {
 	return err
 }
 
-func (s *Storage) Get(rowID int) (string, error) {
+func (s *Storage) Get(rowID int) (*Clip, error) {
 	sqlGet := `
 	SELECT content FROM clips
 	WHERE rowid = ?
@@ -59,39 +51,38 @@ func (s *Storage) Get(rowID int) (string, error) {
 
 	stmt, _ := s.db.Prepare(sqlGet)
 	defer stmt.Close()
-	var content string
+
+	clip := &Clip{}
 	rows, _ := stmt.Query(rowID)
 	for rows.Next() {
-		_ = rows.Scan(&content)
-		log.Printf("got it: %v\n", content)
+		_ = rows.Scan(&clip.Content)
 	}
 
-	return content, nil
+	return clip, nil
 }
 
-func (s *Storage) List(limit int) {
+func (s *Storage) List(limit int) (clips []*Clip) {
 	sqlReadall := fmt.Sprintf(`
 	SELECT rowid, id, content FROM %s
 	ORDER BY datetime(created_at) DESC
 	LIMIT %d
 	`, CLIPS_TABLE, limit)
 
-	log.Printf("scaning for clips")
+	log.Printf("scaning for clips (limit=%d)\n", limit)
 	rows, _ := s.db.Query(sqlReadall)
 	defer rows.Close()
 
 	for rows.Next() {
-		var clipShortcut int
-		item := NewClip()
-		_ = rows.Scan(&clipShortcut, &item.Hash, &item.Content)
-		s.table.Append([]string{strconv.Itoa(clipShortcut), item.Content})
+		item := &Clip{}
+		_ = rows.Scan(&item.Shortcut, &item.Hash, &item.Content)
+		clips = append(clips, item)
 	}
 
-	s.table.Render()
+	return clips
 }
 
 func (s *Storage) SaveIfNew(c *Clip) error {
-	sql_add := `
+	sqlAdd := `
 	INSERT OR REPLACE INTO clips(
 		id,
 		content,
@@ -99,8 +90,9 @@ func (s *Storage) SaveIfNew(c *Clip) error {
 	) VALUES(?, ?, CURRENT_TIMESTAMP)
 	`
 
-	stmt, _ := s.db.Prepare(sql_add)
+	stmt, _ := s.db.Prepare(sqlAdd)
 	defer stmt.Close()
+
 	_, err := stmt.Exec(c.Hash, c.Content)
 	return err
 }

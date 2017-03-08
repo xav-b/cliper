@@ -6,12 +6,19 @@ package main
 import (
 	"crypto/md5"
 	"io"
+	"log"
 
 	"github.com/atotto/clipboard"
 )
 
 type Clip struct {
-	Hash    []byte
+	// md5 computed from `Content`
+	Hash []byte
+
+	// convenient access for UI
+	Shortcut int
+
+	// data directly read from the clipboard
 	Content string
 }
 
@@ -23,10 +30,18 @@ func hash(content string) []byte {
 }
 
 func NewClip() *Clip {
-	copied, _ := clipboard.ReadAll()
+	copied, err := clipboard.ReadAll()
+	if err != nil {
+		log.Printf("failed to read clipboard: %v\n", err)
+	}
 
 	return &Clip{
 		Hash:    hash(copied),
 		Content: copied,
 	}
+}
+
+// Copy encapsulates clipboard write logic
+func (c *Clip) Copy() error {
+	return clipboard.WriteAll(c.Content)
 }

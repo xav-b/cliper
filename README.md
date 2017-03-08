@@ -1,4 +1,4 @@
-# Cliper [![GoDoc Widget]][walker]
+# Cliper [![GoDoc Widget]][walker] [![Go Report Card](https://goreportcard.com/badge/github.com/hackliff/cliper)](https://goreportcard.com/report/github.com/hackliff/cliper) [![Circle CI](https://circleci.com/gh/hackliff/cliper.svg?style=svg)](https://circleci.com/gh/hackliff/cliper)
 
 > Light clipboard manager from the command line
 
@@ -10,7 +10,7 @@ example.
 
 ## Usage
 
-**Cliper** works in client/server mode : a server watches the clipboard
+The tool works in client/server mode : a daemon watches the clipboard
 and stores its history, while you can query it from the client.
 
 Typically you will want to fire the server as a startup daemon and
@@ -68,6 +68,9 @@ curl \
 
 cliper -help
 ```
+
+For the cutting edge version (but probably stable), compile from source: `go get -t -u
+github.com/hackliff/cliper`
 
 ## API Documentation
 

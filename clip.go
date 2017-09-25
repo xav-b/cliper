@@ -7,9 +7,24 @@ import (
 	"crypto/md5"
 	"io"
 	"log"
+	"net/url"
 
 	"github.com/atotto/clipboard"
 )
+
+const (
+	UNKNOWN_TYPE = iota // 0
+	URL_TYPE            // 1
+)
+
+func detectType(rawClip string) int {
+	// is it an url ?
+	if _, err := url.ParseRequestURI(rawClip); err == nil {
+		return URL_TYPE
+	}
+
+	return UNKNOWN_TYPE
+}
 
 type Clip struct {
 	// md5 computed from `Content`
@@ -20,6 +35,12 @@ type Clip struct {
 
 	// data directly read from the clipboard
 	Content string
+
+	// standout useful clips
+	Pinned bool
+
+	// try to identify different type of clips, like code snippets, urls, ...
+	Type int
 }
 
 func hash(content string) []byte {
@@ -35,9 +56,13 @@ func NewClip() *Clip {
 		log.Printf("failed to read clipboard: %v\n", err)
 	}
 
+	detectedType := detectType(copied)
+
 	return &Clip{
 		Hash:    hash(copied),
 		Content: copied,
+		Type:    detectType(copied),
+		Pinned:  false,
 	}
 }
 

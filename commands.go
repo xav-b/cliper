@@ -45,7 +45,7 @@ func WatchClipboard(storage *Storage, cli *CliOptions) error {
 	log.Printf("watching for clipboard [refresh=%v]\n", cli.Refresh)
 	for {
 		c := NewClip()
-		if err := storage.SaveIfNew(c); err != nil {
+		if err := storage.Upsert(c); err != nil {
 			return err
 		}
 

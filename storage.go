@@ -32,10 +32,13 @@ func NewStorage(dbPath string, reset bool) (*Storage, error) {
 }
 
 func (s *Storage) Init() error {
+	// TODO updated at
 	sql_table := `
 	CREATE TABLE IF NOT EXISTS clips(
 		id TEXT NOT NULL PRIMARY KEY,
+		type INT,
 		content TEXT NOT NULL,
+		pinned BOOLEAN,
 		created_at DATETIME
 	);
 	`
@@ -63,7 +66,6 @@ func (s *Storage) Get(rowID int) (*Clip, error) {
 
 func (s *Storage) List(limit int) (clips []*Clip) {
 	sqlReadall := fmt.Sprintf(`
-	SELECT rowid, id, content FROM %s
 	ORDER BY datetime(created_at) DESC
 	LIMIT %d
 	`, CLIPS_TABLE, limit)
@@ -81,18 +83,33 @@ func (s *Storage) List(limit int) (clips []*Clip) {
 	return clips
 }
 
-func (s *Storage) SaveIfNew(c *Clip) error {
+func (s *Storage) Upsert(c *Clip) error {
 	sqlAdd := `
 	INSERT OR REPLACE INTO clips(
 		id,
+		type,
 		content,
+		pinned,
 		created_at
-	) VALUES(?, ?, CURRENT_TIMESTAMP)
+	) VALUES(?, ?, ?, ?, CURRENT_TIMESTAMP)
 	`
 
 	stmt, _ := s.db.Prepare(sqlAdd)
 	defer stmt.Close()
 
-	_, err := stmt.Exec(c.Hash, c.Content)
+	_, err := stmt.Exec(c.Hash, c.Type, c.Content, c.Pinned)
+	return err
+}
+
+func (s *Storage) Reset() error {
+	// NOTE could filter out the one pinned, with a flag
+	query := `
+	DELETE *
+	FROM clips
+	`
+	stmt, _ := s.db.Prepare(query)
+	defer stmt.Close()
+
+	_, err := stmt.Exec()
 	return err
 }

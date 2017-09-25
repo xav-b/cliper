@@ -3,7 +3,7 @@
 
 # alternative : git describe --always --tags
 # choose to set from here or from the command line
-VERSION          ?= "0.1.1"
+VERSION          ?= "0.1.4"
 
 BUILD_PATH       := ./_dist
 RELEASE_OPTS     ?= ""

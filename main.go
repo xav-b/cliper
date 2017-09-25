@@ -29,7 +29,7 @@ func main() {
 		fmt.Printf("err: %v\n", err)
 		os.Exit(1)
 	}
-	// create tables
+	// create tables if not exists
 	storage.Init()
 
 	runnable, ok := commands[cli.Command]

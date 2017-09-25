@@ -13,7 +13,8 @@ import (
 
 const (
 	DEFAULT_REFRESH = "1s"
-	DEFAULT_DB_PATH = "/tmp/clip.db"
+	//DEFAULT_DB_PATH = "/tmp/clip.db"
+	DEFAULT_DB_PATH = "./clip.db"
 	DEFAULT_COMMAND = "ls"
 	DEFAULT_LAST    = 20
 )
